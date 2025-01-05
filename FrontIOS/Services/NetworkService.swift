@@ -18,8 +18,12 @@ enum NetworkError: Error {
 
 
 class NetworkService {
-    private let baseURL = "http://172.18.25.95:3000"
- 
+    private let baseURL = "http://192.168.1.135:3000"
+    private let googleTokenKey = "googleIdToken"
+    @Published var isAuthenticated = false
+
+
+
     func login(email: String, password: String) async throws -> SignInResponse {
             guard let url = URL(string: "\(baseURL)/auth/login") else {
                 throw NetworkError.invalidURL
@@ -240,6 +244,9 @@ class NetworkService {
             throw NetworkError.serverError("Failed to reset password")
         }
     }
+   
+
+    // Google Sign-In
     func googleSignIn(idToken: String) async throws -> SignInResponse {
         guard let url = URL(string: "\(baseURL)/auth/google-signin") else {
             throw NetworkError.invalidURL
@@ -251,7 +258,7 @@ class NetworkService {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         
         let body = ["idToken": idToken]
-        request.httpBody = try JSONEncoder().encode(body)
+        request.httpBody = try? JSONEncoder().encode(body)
         
         print("Google Sign-In Request Body: \(body)")
         
@@ -381,4 +388,3 @@ class NetworkService {
            }
        }
 }
-

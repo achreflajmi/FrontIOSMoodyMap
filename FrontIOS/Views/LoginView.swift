@@ -24,14 +24,14 @@ struct LoginView: View {
                 Color(hex: colorScheme == .dark ? "#1c1c1e" : "#fef2e4") // Dynamic background for dark/light mode
                     .edgesIgnoringSafeArea(.all)
                     .gesture(
-                                    TapGesture().onEnded {
-                                        FocusField = nil
-                                    }
-                                )
+                        TapGesture().onEnded {
+                            FocusField = nil
+                        }
+                    )
                 // Circles positioned in the top-left corner
                 CircleBackgroundView()
                     .offset(x: -200, y: -400)
-
+                
                 VStack(alignment: .center, spacing: 20) {
                     Text("Welcome back!")
                         .font(.title)
@@ -45,7 +45,7 @@ struct LoginView: View {
                         .scaledToFit()
                         .frame(width: 100, height: 100)
                         .clipShape(Circle())
-
+                    
                     VStack(spacing: 30) {
                         CustomTextEntryField(
                             text: $viewModel.email,
@@ -69,7 +69,7 @@ struct LoginView: View {
                             FocusField = nil
                         }
                         .foregroundColor(colorScheme == .dark ? .black : .black) // Adjust text color for dark/light mode
-
+                        
                         HStack {
                             Button(action: { viewModel.rememberMe.toggle() }) {
                                 HStack(spacing: 8) {
@@ -82,7 +82,7 @@ struct LoginView: View {
                             }
                             Spacer()
                         }
-
+                        
                         Button(action: {
                             Task {
                                 await viewModel.login()
@@ -103,7 +103,7 @@ struct LoginView: View {
                                 .cornerRadius(10)
                         }
                         .disabled(viewModel.isLoading)
-
+                        
                         if showErrorMessage {
                             Text(viewModel.signInMessage)
                                 .foregroundColor(.red)
@@ -111,7 +111,7 @@ struct LoginView: View {
                                 .multilineTextAlignment(.center)
                                 .padding(.top, 10)
                         }
-
+                        
                         Button(action: {
                             navigateToForgotPassword = true
                         }) {
@@ -133,13 +133,13 @@ struct LoginView: View {
                             }
                         }
                         .padding(.bottom, 10)
-
+                        
                         Divider()
-
+                        
                         Text("Or continue with")
                             .foregroundColor(colorScheme == .dark ? .gray : .black)
                             .font(.footnote)
-
+                        
                         HStack(spacing: 20) {
                             SocialLoginButton(imageName: "Gmail", backgroundColor: Color.white, action: {
                                 Task {
@@ -164,7 +164,7 @@ struct LoginView: View {
                         configureGoogleSignIn()
                     }
                 }
-
+                
                 NavigationLink(destination: ForgotPasswordView(), isActive: $navigateToForgotPassword) {
                     EmptyView()
                 }
@@ -182,15 +182,16 @@ struct LoginView: View {
             }
         }
     }
-
-
-
-
+    
+    
+    
+    
     private func configureGoogleSignIn() {
         GIDSignIn.sharedInstance.configuration = GIDConfiguration(
             clientID: "752196072722-gornn57no13fp2b4h16m4vo66055bpna.apps.googleusercontent.com"
         )
     }
+    
     
     private func handleGoogleSignIn() async {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
@@ -202,7 +203,7 @@ struct LoginView: View {
         do {
             viewModel.isLoading = true
             let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController)
-            
+
             guard let idToken = result.user.idToken?.tokenString else {
                 print("Failed to get ID token")
                 await MainActor.run {
@@ -212,12 +213,32 @@ struct LoginView: View {
                 }
                 return
             }
-            
+
+            let user = result.user
+
+            // Get the backend sign-in response
             let signInResponse = try await networkService.googleSignIn(idToken: idToken)
-            
+            if viewModel.isSignInSuccessful {
+                authManager.isAuthenticated = true
+                authManager.checkAuthenticationStatus()
+            } else {
+                showErrorMessage = true
+            }
+
+            let userInfo: [String: Any] = [
+                "userId": user.userID ?? "",
+                "name": user.profile?.name ?? "Unknown Name",
+                "email": user.profile?.email ?? "Unknown Email",
+                "accessToken": signInResponse.accessToken // Include the backend token
+            ]
+
             await MainActor.run {
+                AuthenticationManager.shared.signInWithGoogle(idToken: idToken, userInfo: userInfo)
                 viewModel.isSignInSuccessful = true
+                authManager.checkAuthenticationStatus()
+
                 viewModel.signInMessage = "Successfully signed in with Google"
+                
                 viewModel.showAlert = true
                 viewModel.isLoading = false
             }
@@ -243,6 +264,7 @@ struct LoginView: View {
         }
     }
 }
+
 
 // Button for Social Login
 struct SocialLoginButton: View {

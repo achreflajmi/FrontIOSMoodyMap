@@ -2,7 +2,7 @@ import Foundation
 
 class QuoteService {
     static let shared = QuoteService()
-    private let baseURL = "http://172.18.25.95:3000"
+    private let baseURL = "http://192.168.1.135:3000"
     
     func fetchDailyQuote() async throws -> QuoteResponse {
         guard let url = URL(string: "\(baseURL)/quotes/daily") else {

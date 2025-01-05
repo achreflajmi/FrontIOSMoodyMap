@@ -2,7 +2,7 @@ import Foundation
 
 class EventRecommendationService {
     static let shared = EventRecommendationService()
-    private let baseURL = "http://172.18.25.95:3000"
+    private let baseURL = "http://192.168.1.135:3000"
     
     func fetchRecommendedEvents() async throws -> EventRecommendationResponse {
         guard let url = URL(string: "\(baseURL)/events/recommendations/daily") else {

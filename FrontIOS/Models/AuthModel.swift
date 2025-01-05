@@ -8,9 +8,9 @@
 struct User: Codable {
     let name: String
     let email: String
-    let password: String
+    let password: String?
     let id: String
-    let version: Int
+    let version: Int?
     
     enum CodingKeys: String, CodingKey {
         case name
@@ -55,4 +55,4 @@ struct UserDetails: Codable {
     let userId: String
     let name: String
     let email: String
-}	
+}

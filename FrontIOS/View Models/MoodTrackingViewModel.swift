@@ -7,7 +7,7 @@ class MoodTrackingViewModel: ObservableObject {
     @Published var detectedUserId: String = ""
     @Published var isLoading: Bool = false
     @Published var errorMessage: String = ""
-    private let baseURL = "http://172.18.25.95:3000"
+    private let baseURL = "http://192.168.1.135:3000"
     private let tokenKey = "authToken" // Key to store the token
     static let shared = MoodTrackingViewModel()
 

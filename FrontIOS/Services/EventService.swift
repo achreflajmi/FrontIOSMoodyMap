@@ -2,7 +2,7 @@ import Foundation
 
 class EventService {
     static let shared = EventService()
-    private let baseURL = "http://172.18.25.95:3000/events"
+    private let baseURL = "http://192.168.1.135:3000/events"
     
     private lazy var jsonDecoder: JSONDecoder = {
         let decoder = JSONDecoder()

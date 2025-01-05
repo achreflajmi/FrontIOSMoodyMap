@@ -2,7 +2,7 @@ import Foundation
 
 class StudyPlanService {
     static let shared = StudyPlanService()
-    private let baseURL = "http://172.18.25.95:3000"
+    private let baseURL = "http://192.168.1.135:3000"
     private let tokenKey = "authToken"
     @Published var isLoading: Bool = false
     @Published var errorMessage: String = ""

@@ -10,8 +10,10 @@ class MoodAssessmentViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String = ""
     @Published var userType: String = ""
+    private let googleTokenKey = "googleIdToken" // Define googleTokenKey here
+
     
-    private let baseURL = "http://172.18.25.95:3000"
+    private let baseURL = "http://192.168.1.135:3000"
     private let tokenKey = "authToken"
     let questions = MoodAssessmentData.questions
     let maxScore = MoodAssessmentData.maxScore
@@ -35,7 +37,7 @@ class MoodAssessmentViewModel: ObservableObject {
     }
 
     private func completeAssessment() {
-        guard let token = UserDefaults.standard.string(forKey: tokenKey) else {
+        guard let token = UserDefaults.standard.string(forKey: tokenKey) ?? UserDefaults.standard.string(forKey: googleTokenKey) else {
             errorMessage = "User not authenticated"
             print("Token not found in UserDefaults")
             isLoading = false
